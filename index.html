@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Teknologi Aplikasi Mobile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+        .option-label {
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .option-label:has(input:checked) {
+            background-color: #e0f2fe; /* light-blue-100 */
+            border-color: #38bdf8; /* light-blue-400 */
+        }
+    </style>
+</head>
+<body class="bg-slate-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="container bg-white rounded-xl shadow-lg w-full max-w-3xl">
+
+        <!-- Halaman Login -->
+        <div id="login-page" class="page active p-8 md:p-12">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-slate-800">Kuis Interaktif</h1>
+                <p class="text-slate-600 mt-2 text-lg">Mengenal Teknologi Aplikasi Mobile</p>
+            </div>
+            <form id="login-form" class="space-y-6">
+                <div>
+                    <label for="fullname" class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap</label>
+                    <input type="text" id="fullname" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required placeholder="Contoh Abysai Qeeno Putra">
+                </div>
+                <div>
+                    <label for="nis" class="block text-sm font-medium text-slate-700 mb-1">NIS (Nomor Induk Siswa)</label>
+                    <input type="number" id="nis" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required placeholder="Contoh 24223">
+                </div>
+                <div>
+                    <label for="class" class="block text-sm font-medium text-slate-700 mb-1">Kelas</label>
+                    <input type="text" id="class" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required placeholder="Contoh: XII RPL 1">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-transform transform hover:scale-105">Mulai Kuis</button>
+            </form>
+        </div>
+
+        <!-- Halaman Kuis -->
+        <div id="quiz-page" class="page p-8">
+            <h2 id="quiz-header" class="text-2xl font-bold text-slate-800 text-center mb-6">Memuat Soal...</h2>
+            <form id="quiz-form" class="space-y-8"></form>
+            <button id="submit-quiz" class="w-full mt-8 bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition-transform transform hover:scale-105">Selesaikan Kuis</button>
+        </div>
+
+        <!-- Halaman Hasil -->
+        <div id="result-page" class="page p-8 text-center">
+            <h2 class="text-3xl font-bold text-slate-800">Hasil Kuis</h2>
+            <div id="student-info" class="my-4 text-slate-600 bg-slate-100 p-4 rounded-lg"></div>
+            
+            <p class="text-lg text-slate-700 mt-6">Skor yang Baru Saja Diperoleh:</p>
+            <div id="current-score" class="text-5xl font-bold text-slate-800 my-2">0</div>
+
+            <p class="text-lg text-slate-700 mt-4">Skor Terbaik Anda:</p>
+            <div id="best-score" class="text-7xl font-bold text-blue-600 my-4">0</div>
+
+            <div id="attempt-info" class="text-sm text-slate-500 mb-6"></div>
+
+            <div class="flex flex-col md:flex-row gap-4 justify-center">
+                <button id="retry-quiz" class="w-full md:w-auto bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition">Kerjakan Lagi</button>
+                <button id="view-review" class="w-full md:w-auto bg-slate-700 text-white font-bold py-3 px-6 rounded-lg hover:bg-slate-800 transition">Lihat Ulasan Jawaban</button>
+            </div>
+            
+            <div id="review-container" class="hidden mt-8 text-left">
+                <h3 class="text-2xl font-bold text-slate-800 mb-4">Ulasan Jawaban (Skor Terbaik)</h3>
+                <div id="review-section" class="space-y-4"></div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // --- KUMPULAN DATA SOAL ---
+    const questions = [
+        { question: "Sistem operasi mobile yang dikembangkan oleh Google adalah...", options: ["iOS", "Android", "Windows Phone", "Symbian"], answer: "Android", review: "Android adalah sistem operasi berbasis Linux yang dirancang untuk perangkat seluler layar sentuh seperti smartphone dan tablet. Ini adalah OS mobile paling populer di dunia." },
+        { question: "Bahasa pemrograman resmi yang direkomendasikan Google untuk pengembangan aplikasi Android native adalah...", options: ["Swift", "Java", "Kotlin", "C#"], answer: "Kotlin", review: "Sejak Google I/O 2019, Kotlin telah menjadi bahasa pemrograman yang lebih disukai untuk pengembangan aplikasi Android, menggantikan Java karena sintaksnya yang lebih ringkas dan aman." },
+        { question: "Manakah yang merupakan framework untuk pengembangan aplikasi mobile cross-platform?", options: ["Xcode", "Android Studio", "React Native", "Visual Studio"], answer: "React Native", review: "React Native adalah framework yang dikembangkan oleh Facebook untuk membuat aplikasi mobile di iOS dan Android dengan menggunakan basis kode yang sama dari JavaScript dan React." },
+        { question: "Singkatan dari APK dalam konteks aplikasi Android adalah...", options: ["Android Package Kit", "Application Programming Kit", "Android Programming Kernel", "Application Package File"], answer: "Android Package Kit", review: "APK (Android Package Kit) adalah format file paket yang digunakan oleh sistem operasi Android untuk distribusi dan instalasi aplikasi mobile." },
+        { question: "Apple App Store adalah platform distribusi digital untuk aplikasi...", options: ["Android", "Windows", "iOS", "Linux"], answer: "iOS", review: "App Store adalah platform eksklusif milik Apple untuk mendistribusikan aplikasi ke perangkat yang menjalankan sistem operasi iOS, seperti iPhone dan iPad." },
+        { question: "Teknologi yang memungkinkan aplikasi untuk menentukan lokasi geografis pengguna disebut...", options: ["Bluetooth", "NFC", "GPS", "Wi-Fi"], answer: "GPS", review: "GPS (Global Positioning System) adalah sistem navigasi satelit yang memberikan informasi lokasi dan waktu di semua kondisi cuaca, di mana pun di atau dekat Bumi." },
+        { question: "Apa nama IDE (Integrated Development Environment) resmi untuk pengembangan aplikasi Android?", options: ["Eclipse", "NetBeans", "Android Studio", "Xcode"], answer: "Android Studio", review: "Android Studio adalah IDE resmi dari Google yang menyediakan alat terlengkap untuk membangun aplikasi di setiap jenis perangkat Android." },
+        { question: "Bahasa pemrograman yang digunakan untuk mengembangkan aplikasi native di iOS adalah...", options: ["Java", "Kotlin", "Swift", "Python"], answer: "Swift", review: "Swift adalah bahasa pemrograman yang kuat dan intuitif yang dibuat oleh Apple untuk membangun aplikasi untuk iOS, Mac, Apple TV, dan Apple Watch." },
+        { question: "Istilah untuk desain antarmuka aplikasi yang berfokus pada kemudahan dan kenyamanan pengguna adalah...", options: ["UI (User Interface)", "UX (User Experience)", "API (Application Programming Interface)", "SDK (Software Development Kit)"], answer: "UX (User Experience)", review: "UX (User Experience) mencakup semua aspek interaksi pengguna akhir dengan perusahaan, layanan, dan produknya. Tujuannya adalah untuk meningkatkan kepuasan dan loyalitas pelanggan." },
+        { question: "Jenis aplikasi mobile yang berjalan di dalam browser dan tidak perlu diinstal adalah...", options: ["Aplikasi Native", "Aplikasi Hybrid", "Progressive Web App (PWA)", "Aplikasi Desktop"], answer: "Progressive Web App (PWA)", review: "PWA menggunakan teknologi web modern untuk memberikan pengalaman seperti aplikasi kepada pengguna. Mereka dapat diakses melalui browser dan tidak memerlukan instalasi dari app store." },
+        { question: "Framework UI dari Google untuk membangun antarmuka yang indah secara native untuk mobile, web, dan desktop dari satu basis kode adalah...", options: ["Xamarin", "Flutter", "Ionic", "Cordova"], answer: "Flutter", review: "Flutter adalah UI toolkit dari Google untuk membuat aplikasi yang dikompilasi secara native. Ini memungkinkan pengembangan aplikasi yang cepat dan antarmuka yang ekspresif." },
+        { question: "Notifikasi yang muncul di layar perangkat mobile bahkan saat aplikasi tidak sedang dibuka disebut...", options: ["Toast Notification", "Push Notification", "In-App Notification", "Email Notification"], answer: "Push Notification", review: "Push Notification adalah pesan yang dikirim oleh server aplikasi ke antarmuka pengguna aplikasi, yang memungkinkan aplikasi memberi tahu Anda tentang pembaruan meskipun tidak aktif." },
+        { question: "Komponen dalam Android yang bertanggung jawab untuk menampilkan satu layar antarmuka pengguna (UI) adalah...", options: ["Service", "Activity", "Broadcast Receiver", "Content Provider"], answer: "Activity", review: "Sebuah Activity merepresentasikan satu layar dengan antarmuka pengguna. Ini adalah komponen fundamental tempat semua interaksi pengguna terjadi." },
+        { question: "Untuk mempublikasikan aplikasi ke Google Play Store, seorang developer memerlukan akun...", options: ["Google Developer", "Apple Developer", "Microsoft Developer", "Akun Google Biasa"], answer: "Google Developer", review: "Untuk mempublikasikan aplikasi di Google Play, Anda harus mendaftar untuk akun Google Play Developer, yang memerlukan biaya pendaftaran satu kali." },
+        { question: "Sensor pada smartphone yang mendeteksi orientasi perangkat (potret atau lanskap) adalah...", options: ["Giroskop", "Akselerometer", "Magnetometer", "Sensor Jarak"], answer: "Akselerometer", review: "Akselerometer mengukur percepatan. Ini dapat mendeteksi perubahan orientasi perangkat dan digunakan untuk memutar layar secara otomatis." },
+        { question: "Apa fungsi utama dari sebuah API (Application Programming Interface) dalam pengembangan mobile?", options: ["Merancang tampilan visual aplikasi", "Menghubungkan aplikasi dengan database atau layanan web lain", "Mengubah kode menjadi aplikasi", "Menguji aplikasi untuk bug"], answer: "Menghubungkan aplikasi dengan database atau layanan web lain", review: "API bertindak sebagai jembatan yang memungkinkan aplikasi Anda berkomunikasi dan bertukar data dengan layanan eksternal, seperti media sosial, data cuaca, atau database server." },
+        { question: "Aplikasi yang menggabungkan elemen dari aplikasi native dan aplikasi web disebut...", options: ["Aplikasi Standalone", "Aplikasi Hybrid", "Aplikasi Progresif", "Aplikasi Cloud"], answer: "Aplikasi Hybrid", review: "Aplikasi Hybrid dibangun menggunakan teknologi web (HTML, CSS, JavaScript) dan kemudian dibungkus dalam wadah native, yang memungkinkan mereka untuk diinstal seperti aplikasi native." },
+        { question: "Database lokal yang sering digunakan pada aplikasi mobile untuk menyimpan data secara offline adalah...", options: ["MySQL", "PostgreSQL", "MongoDB", "SQLite"], answer: "SQLite", review: "SQLite adalah mesin database SQL yang ringan dan mandiri yang tertanam langsung ke dalam aplikasi. Ini sangat ideal untuk penyimpanan data lokal di perangkat mobile." },
+        { question: "File yang mendefinisikan struktur dasar dan komponen dari sebuah aplikasi Android adalah...", options: ["build.gradle", "MainActivity.kt", "AndroidManifest.xml", "styles.xml"], answer: "AndroidManifest.xml", review: "File AndroidManifest.xml berisi informasi penting tentang aplikasi Anda yang harus diketahui oleh sistem Android sebelum dapat menjalankan kode apa pun." },
+        { question: "Metode monetisasi aplikasi di mana pengguna membayar untuk mengunduh aplikasi disebut...", options: ["Freemium", "In-App Purchase", "Paid Apps (Premium)", "Subscription"], answer: "Paid Apps (Premium)", review: "Model Paid Apps (Aplikasi Berbayar) mengharuskan pengguna untuk melakukan pembayaran satu kali di muka untuk mengunduh dan menggunakan aplikasi." },
+        { question: "Proses optimasi halaman aplikasi di app store untuk mendapatkan peringkat lebih tinggi disebut...", options: ["SEO (Search Engine Optimization)", "ASO (App Store Optimization)", "SMM (Social Media Marketing)", "SEM (Search Engine Marketing)"], answer: "ASO (App Store Optimization)", review: "ASO adalah proses meningkatkan visibilitas aplikasi di dalam toko aplikasi. Ini melibatkan optimasi judul, kata kunci, deskripsi, dan tangkapan layar." },
+        { question: "Versi Android yang memiliki nama kode 'Oreo' adalah versi...", options: ["6.0", "7.0", "8.0", "9.0"], answer: "8.0", review: "Android 8.0 'Oreo' dirilis pada tahun 2017 dan memperkenalkan fitur-fitur seperti picture-in-picture dan titik notifikasi." },
+        { question: "Pola arsitektur yang direkomendasikan Google untuk membangun aplikasi Android yang tangguh dan dapat diuji adalah...", options: ["MVC (Model-View-Controller)", "MVP (Model-View-Presenter)", "MVVM (Model-View-ViewModel)", "VIPER"], answer: "MVVM (Model-View-ViewModel)", review: "MVVM adalah bagian dari Android Architecture Components yang direkomendasikan Google untuk memisahkan logika UI dari logika bisnis, membuat kode lebih mudah dikelola dan diuji." },
+        { question: "Teknologi yang memungkinkan pembayaran nirkontak menggunakan smartphone adalah...", options: ["QR Code", "Bluetooth", "NFC (Near Field Communication)", "Infrared"], answer: "NFC (Near Field Communication)", review: "NFC adalah serangkaian protokol komunikasi yang memungkinkan dua perangkat elektronik untuk membangun komunikasi dengan mendekatkannya dalam jarak 4 cm." },
+        { question: "Manakah dari berikut ini yang BUKAN merupakan keuntungan dari aplikasi native?", options: ["Performa terbaik", "Akses penuh ke fitur perangkat", "Satu basis kode untuk semua platform", "Pengalaman pengguna yang konsisten dengan OS"], answer: "Satu basis kode untuk semua platform", review: "Keuntungan utama dari pengembangan cross-platform (seperti React Native atau Flutter) adalah satu basis kode. Aplikasi native memerlukan basis kode terpisah untuk setiap platform (misalnya, Swift untuk iOS dan Kotlin untuk Android)." }
+    ];
+
+    // --- MANAJEMEN STATE APLIKASI ---
+    let studentData = {};
+    let attempts = [];
+    let currentShuffledQuestions = [];
+
+    // --- ELEMEN DOM ---
+    const pages = document.querySelectorAll('.page');
+    const loginForm = document.getElementById('login-form');
+    const quizForm = document.getElementById('quiz-form');
+    const submitButton = document.getElementById('submit-quiz');
+    const retryButton = document.getElementById('retry-quiz');
+    const viewReviewButton = document.getElementById('view-review');
+
+    // --- FUNGSI UTAMA ---
+    function showPage(pageId) {
+        pages.forEach(page => page.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+    }
+
+    function startQuiz() {
+        quizForm.innerHTML = ''; 
+        currentShuffledQuestions = [...questions].sort(() => Math.random() - 0.5); // Acak soal
+
+        currentShuffledQuestions.forEach((q, index) => {
+            const questionElement = document.createElement('div');
+            questionElement.classList.add('question', 'bg-slate-50', 'p-6', 'rounded-lg');
+            
+            let optionsHTML = `<p class="text-lg font-semibold text-slate-800 mb-4">${index + 1}. ${q.question}</p><div class="options space-y-3">`;
+            const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5); // Acak opsi
+
+            shuffledOptions.forEach(option => {
+                optionsHTML += `
+                    <label class="option-label flex items-center w-full p-3 border-2 border-slate-200 rounded-lg cursor-pointer hover:bg-slate-200">
+                        <input type="radio" name="question${index}" value="${option}" class="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300">
+                        <span class="text-slate-700">${option}</span>
+                    </label>
+                `;
+            });
+            optionsHTML += `</div>`;
+            questionElement.innerHTML = optionsHTML;
+            quizForm.appendChild(questionElement);
+        });
+
+        document.getElementById('quiz-header').textContent = `Kuis: Teknologi Aplikasi Mobile (Kesempatan ke-${attempts.length + 1})`;
+        showPage('quiz-page');
+    }
+
+    function calculateScore() {
+        let score = 0;
+        const userSelections = [];
+        
+        currentShuffledQuestions.forEach((q, index) => {
+            const selectedOption = quizForm.querySelector(`input[name="question${index}"]:checked`);
+            let userAnswer = selectedOption ? selectedOption.value : null;
+            if (userAnswer === q.answer) {
+                score++;
+            }
+            userSelections.push({ ...q, userAnswer });
+        });
+        
+        const finalScore = (score / questions.length) * 100;
+        attempts.push({ score: finalScore, answers: userSelections });
+        displayResult();
+    }
+
+    function displayResult() {
+        const bestAttempt = attempts.reduce((prev, current) => (prev.score > current.score) ? prev : current);
+        const lastAttempt = attempts[attempts.length - 1];
+        
+        document.getElementById('student-info').innerHTML = `
+            <span class="block"><strong>Nama:</strong> ${studentData.fullname}</span>
+            <span class="block"><strong>NIS:</strong> ${studentData.nis}</span>
+            <span class="block"><strong>Kelas:</strong> ${studentData.class}</span>
+        `;
+        
+        document.getElementById('current-score').textContent = Math.round(lastAttempt.score);
+        document.getElementById('best-score').textContent = Math.round(bestAttempt.score);
+        
+        let attemptInfoHTML = '<strong>Riwayat Pengerjaan:</strong> ';
+        attempts.forEach((attempt, index) => {
+            attemptInfoHTML += `Percobaan ${index + 1}: Skor ${Math.round(attempt.score)}. `;
+        });
+        document.getElementById('attempt-info').innerHTML = attemptInfoHTML;
+
+        retryButton.style.display = (attempts.length >= 2) ? 'none' : 'inline-flex';
+
+        generateReview(bestAttempt.answers);
+        showPage('result-page');
+    }
+
+    function generateReview(answers) {
+        const reviewSection = document.getElementById('review-section');
+        reviewSection.innerHTML = '';
+        
+        answers.forEach((ans, index) => {
+            const isCorrect = ans.userAnswer === ans.answer;
+            const item = document.createElement('div');
+            item.className = 'p-4 rounded-lg border';
+            
+            if (isCorrect) {
+                item.classList.add('bg-green-50', 'border-green-200');
+            } else {
+                item.classList.add('bg-red-50', 'border-red-200');
+            }
+
+            const userAnswerText = ans.userAnswer ? `"${ans.userAnswer}"` : 'Tidak dijawab';
+
+            item.innerHTML = `
+                <p class="font-bold text-slate-800">${index + 1}. ${ans.question}</p>
+                <p class="mt-2 text-sm">Jawaban Anda: <span class="font-semibold ${isCorrect ? 'text-green-700' : 'text-red-700'}">${userAnswerText}</span></p>
+                <p class="text-sm">Jawaban Benar: <span class="font-semibold text-green-700">"${ans.answer}"</span></p>
+                <p class="mt-2 pt-2 border-t border-slate-200 text-sm text-slate-600"><strong>Ulasan:</strong> ${ans.review}</p>
+            `;
+            reviewSection.appendChild(item);
+        });
+    }
+
+    // --- EVENT LISTENERS ---
+    loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        studentData.fullname = document.getElementById('fullname').value;
+        studentData.nis = document.getElementById('nis').value;
+        studentData.class = document.getElementById('class').value;
+        startQuiz();
+    });
+
+    submitButton.addEventListener('click', () => {
+        const totalQuestions = currentShuffledQuestions.length;
+        const answeredQuestions = quizForm.querySelectorAll('input[type="radio"]:checked').length;
+
+        if(answeredQuestions < totalQuestions && !confirm('Anda belum menjawab semua soal. Yakin ingin menyelesaikan kuis?')) {
+            return;
+        }
+        calculateScore();
+    });
+
+    retryButton.addEventListener('click', () => {
+        startQuiz();
+        document.getElementById('review-container').classList.add('hidden'); // Sembunyikan ulasan saat mengulang
+        viewReviewButton.textContent = 'Lihat Ulasan Jawaban';
+    });
+
+    viewReviewButton.addEventListener('click', () => {
+        const reviewContainer = document.getElementById('review-container');
+        const isHidden = reviewContainer.classList.contains('hidden');
+        reviewContainer.classList.toggle('hidden');
+        viewReviewButton.textContent = isHidden ? 'Sembunyikan Ulasan' : 'Lihat Ulasan Jawaban';
+    });
+</script>
+
+</body>
+</html>
